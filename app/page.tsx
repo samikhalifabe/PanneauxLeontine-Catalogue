@@ -1,166 +1,28 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { SiteHeader } from "@/components/site-header"
-import type { Product } from "@/types/product"
 import { CatalogueTableWithSelector } from "@/components/catalogue-table-with-selector"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { getSharedSupabaseClient } from "@/lib/supabase-client"
-
-// Fonction optimisée pour récupérer tous les produits groupés par catégorie
-async function getProductsByCategory(selectedCategories?: string[]): Promise<Record<string, Product[]>> {
-  try {
-    const supabase = await getSharedSupabaseClient()
-
-    // Si des catégories spécifiques sont sélectionnées, on ne récupère que celles-ci
-    let query = supabase
-      .from("products")
-      .select("*")
-      .order("category", { ascending: true })
-      
-    // Filtrer par catégories si spécifiées
-    if (selectedCategories && selectedCategories.length > 0) {
-      query = query.in("category", selectedCategories)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      console.error("Error fetching products:", error)
-      return {}
-    }
-
-    // Grouper les produits par catégorie
-    const productsByCategory: Record<string, Product[]> = {}
-    data.forEach((product: any) => {
-      const category = product.category || "Non classé"
-      if (!productsByCategory[category]) {
-        productsByCategory[category] = []
-      }
-      productsByCategory[category].push(product)
-    })
-
-    return productsByCategory
-  } catch (error) {
-    console.error("Erreur lors de la récupération des produits:", error)
-    return {}
-  }
-}
-
-// Fonction pour récupérer uniquement les catégories disponibles avec leur nombre de produits
-async function getAvailableCategoriesWithCount(): Promise<Record<string, number>> {
-  try {
-    const supabase = await getSharedSupabaseClient()
-    
-    const { data, error } = await supabase
-      .from("products")
-      .select("category")
-      .not("category", "is", null)
-
-    if (error) {
-      console.error("Error fetching categories:", error)
-      return {}
-    }
-
-    // Compter les produits par catégorie
-    const categoryCounts: Record<string, number> = {}
-    data.forEach((item: { category: string }) => {
-      const category = item.category || "Non classé"
-      categoryCounts[category] = (categoryCounts[category] || 0) + 1
-    })
-
-    return categoryCounts
-  } catch (error) {
-    console.error("Erreur lors de la récupération des catégories:", error)
-    return {}
-  }
-}
-
-// Fonction pour récupérer uniquement les catégories disponibles
-async function getAvailableCategories(): Promise<string[]> {
-  try {
-    const supabase = await getSharedSupabaseClient()
-    
-    const { data, error } = await supabase
-      .from("products")
-      .select("category")
-      .not("category", "is", null)
-
-    if (error) {
-      console.error("Error fetching categories:", error)
-      return []
-    }
-
-    // Extraire les catégories uniques avec typage correct
-    const categories = [...new Set(data.map((item: { category: string }) => item.category))].sort()
-    return categories as string[]
-  } catch (error) {
-    console.error("Erreur lors de la récupération des catégories:", error)
-    return []
-  }
-}
+import { useCatalogue } from "@/hooks/use-catalogue"
+import { Button } from "@/components/ui/button"
+import { RefreshCw } from "lucide-react"
 
 export default function HomePage() {
-  const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({})
-  const [availableCategories, setAvailableCategories] = useState<string[]>([])
-  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  // Chargement initial des catégories et de leurs compteurs
-  useEffect(() => {
-    async function loadCategories() {
-      try {
-        setIsLoading(true)
-        setError(null)
-        
-        // Charger les catégories et leurs compteurs en parallèle
-        const [categories, counts] = await Promise.all([
-          getAvailableCategories(),
-          getAvailableCategoriesWithCount()
-        ])
-        
-        setAvailableCategories(categories)
-        setCategoryCounts(counts)
-        
-        // Par défaut, sélectionner les 3 premières catégories pour réduire le chargement initial
-        const initialCategories = categories.slice(0, 3)
-        setSelectedCategories(initialCategories)
-        
-        // Charger seulement les produits des catégories sélectionnées
-        const products = await getProductsByCategory(initialCategories)
-        setProductsByCategory(products)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Une erreur est survenue lors du chargement des données")
-        console.error("Erreur dans HomePage:", err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadCategories()
-  }, [])
-
-  // Fonction pour charger les produits des nouvelles catégories sélectionnées
-  const handleCategorySelectionChange = async (newSelectedCategories: string[]) => {
-    setSelectedCategories(newSelectedCategories)
-    
-    // Identifier les nouvelles catégories à charger
-    const categoriesToLoad = newSelectedCategories.filter(
-      cat => !Object.keys(productsByCategory).includes(cat)
-    )
-    
-    if (categoriesToLoad.length > 0) {
-      try {
-        const newProducts = await getProductsByCategory(categoriesToLoad)
-        setProductsByCategory(prev => ({ ...prev, ...newProducts }))
-      } catch (err) {
-        console.error("Erreur lors du chargement des nouvelles catégories:", err)
-      }
-    }
-  }
+  const {
+    productsByCategory,
+    availableCategories,
+    categoryCounts,
+    selectedCategories,
+    isLoading,
+    error,
+    setSelectedCategories,
+    refreshData,
+    clearError
+  } = useCatalogue({
+    initialCategoriesCount: 3,
+    autoLoad: true
+  })
 
   const hasData = availableCategories.length > 0
 
@@ -171,7 +33,10 @@ export default function HomePage() {
         <main className="flex-1">
           <div className="container py-12">
             <div className="flex justify-center items-center h-64">
-              <p>Chargement du catalogue...</p>
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p>Chargement du catalogue...</p>
+              </div>
             </div>
           </div>
         </main>
@@ -185,11 +50,22 @@ export default function HomePage() {
       <main className="flex-1">
         <section className="bg-gradient-to-b from-primary/10 to-background py-4">
           <div className="container">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Le Catalogue</h1>
-              <p className="mt-2 text-muted-foreground">
-                Consultez notre catalogue de produits dans un format tabulaire facile à imprimer
-              </p>
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Le Catalogue</h1>
+                <p className="mt-2 text-muted-foreground">
+                  Consultez notre catalogue de produits dans un format tabulaire facile à imprimer
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refreshData}
+                className="print:hidden"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Actualiser
+              </Button>
             </div>
           </div>
         </section>
@@ -220,11 +96,22 @@ export default function HomePage() {
         <div className="container py-3">
           {error ? (
             <Alert variant="destructive" className="mb-6">
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription className="flex justify-between items-center">
+                <span>{error}</span>
+                <Button variant="outline" size="sm" onClick={clearError}>
+                  Fermer
+                </Button>
+              </AlertDescription>
             </Alert>
           ) : !hasData ? (
             <div className="text-center py-12 border rounded-md">
-              <p className="text-muted-foreground">Aucune donnée de catalogue disponible pour le moment.</p>
+              <p className="text-muted-foreground mb-4">
+                Aucune donnée de catalogue disponible pour le moment.
+              </p>
+              <Button onClick={refreshData} variant="outline">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Réessayer
+              </Button>
             </div>
           ) : (
             <CatalogueTableWithSelector 
@@ -232,7 +119,7 @@ export default function HomePage() {
               categories={availableCategories}
               categoryCounts={categoryCounts}
               selectedCategories={selectedCategories}
-              onCategorySelectionChange={handleCategorySelectionChange}
+              onCategorySelectionChange={setSelectedCategories}
             />
           )}
         </div>
@@ -266,4 +153,4 @@ export default function HomePage() {
       </footer>
     </div>
   )
-}
+} 
