@@ -1,0 +1,342 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.product-card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(189, 53, 58, 0.1), 0 8px 10px -6px rgba(189, 53, 58, 0.1);
+}
+
+/* Ajout de styles pour les vues condensées */
+@media (max-width: 640px) {
+  .product-compact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .product-compact-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1025px) {
+  .product-compact-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+/* Styles pour le HTML dans les descriptions */
+.description-html p {
+  margin-bottom: 0.5rem;
+}
+
+.description-html p:last-child {
+  margin-bottom: 0;
+}
+
+.description-html ul,
+.description-html ol {
+  margin-left: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.description-html ul {
+  list-style-type: disc;
+}
+
+.description-html ol {
+  list-style-type: decimal;
+}
+
+.description-html a {
+  color: #bd353a;
+  text-decoration: underline;
+}
+
+.description-html a:hover {
+  text-decoration: none;
+}
+
+/* Styles pour l'impression */
+@media print {
+  @page {
+    size: landscape;
+    margin: 1cm;
+  }
+
+  body {
+    font-size: 10pt;
+    line-height: 1.3;
+    background: white;
+    color: black;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  .print-page-number:after {
+    content: "Page " counter(page) " sur " counter(pages);
+  }
+
+  a {
+    text-decoration: none;
+    color: black;
+  }
+
+  section {
+    page-break-inside: avoid;
+  }
+
+  .container {
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Cacher les éléments non nécessaires pour l'impression */
+  nav,
+  button,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Styles spécifiques pour les tableaux */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  td,
+  th {
+    padding: 0.25cm;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  /* Assurer que les images s'affichent correctement à l'impression */
+  img.print\:block {
+    display: block !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Forcer l'affichage des éléments cachés pour l'impression */
+  .hidden.print\:block {
+    display: block !important;
+  }
+
+  /* Assurer que les cellules de tableau ont une taille suffisante */
+  td {
+    min-width: 1.5cm;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+
+/* Styles spécifiques pour les tableaux */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+th,
+td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+tr:hover {
+  background-color: #f3f4f6;
+}
+
+/* Styles pour les promotions */
+.promo-badge {
+  background-color: #fef3c7;
+  color: #92400e;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  font-size: 0.75rem;
+  display: inline-block;
+}
+
+/* Styles pour les en-têtes de catégorie */
+.category-header {
+  background-color: #bd353a;
+  color: white;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+}
+
+@layer utilities {
+  /* Styles pour les cartes de produits au survol */
+  .product-card-hover {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .product-card-hover:hover {
+    @apply shadow-lg transform -translate-y-1;
+  }
+
+  /* Styles pour les descriptions HTML */
+  .description-html p {
+    @apply mb-2;
+  }
+  
+  .description-html ul, .description-html ol {
+    @apply ml-4 mb-2;
+  }
+  
+  .description-html li {
+    @apply mb-1;
+  }
+
+  /* Styles pour l'impression */
+  @media print {
+    .print\\:break-inside-avoid-page {
+      break-inside: avoid-page;
+    }
+    
+    .print-page-number::after {
+      content: counter(page);
+    }
+  }
+
+  /* S'assurer que tous les conteneurs d'images Next.js avec fill ont position relative */
+  .relative img[data-nimg="fill"] {
+    position: absolute !important;
+  }
+
+  /* Classe utilitaire pour forcer la position relative sur les conteneurs d'images */
+  .image-container {
+    @apply relative;
+  }
+}
