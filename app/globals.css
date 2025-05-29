@@ -340,3 +340,129 @@ tr:hover {
     @apply relative;
   }
 }
+
+/* Optimisations typographiques et animations */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+/* Amélioration de la lisibilité */
+.font-display {
+  font-feature-settings: "liga", "kern";
+  text-rendering: optimizeLegibility;
+}
+
+/* Animations personnalisées */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Styles pour les cartes de catégories */
+.category-card {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Amélioration des focus pour l'accessibilité */
+.focus\:ring-primary:focus {
+  outline: none;
+  ring-width: 2px;
+  ring-color: #bd353a;
+  ring-opacity: 0.5;
+}
+
+/* Styles pour les badges et indicateurs */
+.status-indicator {
+  position: relative;
+}
+
+.status-indicator::before {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.status-indicator.available::before {
+  background-color: #10b981;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.on-order::before {
+  background-color: #f59e0b;
+}
+
+/* Optimisations pour l'impression */
+@media print {
+  .font-display {
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  
+  .bg-gradient-to-r,
+  .bg-gradient-to-br,
+  .backdrop-blur {
+    background: white !important;
+  }
+  
+  .shadow-lg,
+  .shadow-xl {
+    box-shadow: none !important;
+  }
+  
+  .border-primary\/20,
+  .border-primary\/30 {
+    border-color: #bd353a !important;
+  }
+  
+  /* Amélioration de la lisibilité des tableaux en impression */
+  table {
+    border-collapse: collapse !important;
+  }
+  
+  th {
+    background-color: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    font-weight: bold !important;
+  }
+  
+  td {
+    border: 1px solid #dee2e6 !important;
+    padding: 8px !important;
+  }
+  
+  .text-primary {
+    color: #bd353a !important;
+  }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .text-4xl {
+    font-size: 2rem;
+  }
+  
+  .text-5xl {
+    font-size: 2.5rem;
+  }
+}

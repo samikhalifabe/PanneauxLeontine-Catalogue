@@ -1,9 +1,9 @@
-import Image from "next/image"
 import Link from "next/link"
 import type { Product } from "@/types/product"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { formatPrice, sanitizeHtml } from "@/lib/utils"
+import { SafeImage } from "@/components/safe-image"
 
 interface ProductCardProps {
   product: Product
@@ -14,8 +14,8 @@ export function ProductCard({ product }: ProductCardProps) {
     <Card className="overflow-hidden transition-all product-card-hover border-gray-200">
       <Link href={`/produits/${product.id}`} className="block">
         <div className="relative aspect-square overflow-hidden">
-          <Image
-            src={product.cover_image || "/placeholder.svg?height=300&width=300&query=panneau+en+bois"}
+          <SafeImage
+            src={product.cover_image}
             alt={product.name}
             fill
             className="object-cover transition-transform hover:scale-105"

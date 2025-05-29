@@ -7,10 +7,10 @@ import { ExternalLink, ShoppingCart } from "lucide-react"
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Image 
               src="/logo_kleur_2021.png" 
               alt="Panneaux Léontine" 
@@ -18,6 +18,7 @@ export function SiteHeader() {
               height={60} 
               priority 
               style={{ height: "auto" }}
+              className="h-10 w-auto"
             />
           </Link>
         </div>
@@ -25,7 +26,7 @@ export function SiteHeader() {
           <Button
             asChild
             size="lg"
-            className="bg-primary hover:bg-primary-700 text-white font-bold px-6 py-2 rounded-md shadow-md hover:shadow-lg transition-all duration-300"
+            className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-white font-semibold px-6 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             <Link
               href="http://shop.panneauxleontine.be/"

@@ -1,8 +1,10 @@
 "use client"
 
-import Image from "next/image"
 import { formatPrice } from "@/lib/utils"
 import type { Product } from "@/types/product"
+import { Badge } from "@/components/ui/badge"
+import { CheckCircle, Clock } from "lucide-react"
+import { SafeImage } from "@/components/safe-image"
 
 interface CatalogueTableProps {
   products: Product[]
@@ -11,20 +13,34 @@ interface CatalogueTableProps {
 export function CatalogueTable({ products }: CatalogueTableProps) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse">
+      <table className="w-full border-collapse bg-white">
         <thead>
-          <tr className="bg-gray-100">
-            <th className="border p-2 text-left">Réf.</th>
-            <th className="border p-2 text-left">Produit</th>
-            <th className="border p-2 text-left">Photo</th>
-            <th className="border p-2 text-left">Dimensions</th>
-            <th className="border p-2 text-left">Prix TVAC</th>
-            <th className="border p-2 text-left">Informations</th>
-            <th className="border p-2 text-left">Disponibilité</th>
+          <tr className="bg-gradient-to-r from-slate-50 to-slate-100 border-b-2 border-slate-200">
+            <th className="border-r border-slate-200 p-4 text-left font-semibold text-slate-700 text-sm tracking-wide">
+              RÉFÉRENCE
+            </th>
+            <th className="border-r border-slate-200 p-4 text-left font-semibold text-slate-700 text-sm tracking-wide">
+              PRODUIT
+            </th>
+            <th className="border-r border-slate-200 p-4 text-left font-semibold text-slate-700 text-sm tracking-wide">
+              PHOTO
+            </th>
+            <th className="border-r border-slate-200 p-4 text-left font-semibold text-slate-700 text-sm tracking-wide">
+              DIMENSIONS
+            </th>
+            <th className="border-r border-slate-200 p-4 text-left font-semibold text-slate-700 text-sm tracking-wide">
+              PRIX TVAC
+            </th>
+            <th className="border-r border-slate-200 p-4 text-left font-semibold text-slate-700 text-sm tracking-wide">
+              DESCRIPTION
+            </th>
+            <th className="p-4 text-left font-semibold text-slate-700 text-sm tracking-wide">
+              DISPONIBILITÉ
+            </th>
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => {
+          {products.map((product, index) => {
             // Extraire les dimensions du nom ou de la description
             let dimensions = "Non spécifié"
             const dimensionsRegex =
@@ -34,68 +50,76 @@ export function CatalogueTable({ products }: CatalogueTableProps) {
             const descMatch = product.short_description?.match(dimensionsRegex)
 
             if (nameMatch) {
-              dimensions = `${nameMatch[1]} x ${nameMatch[2]} x ${nameMatch[3]} cm`
+              dimensions = `${nameMatch[1]} × ${nameMatch[2]} × ${nameMatch[3]} cm`
             } else if (descMatch) {
-              dimensions = `${descMatch[1]} x ${descMatch[2]} x ${descMatch[3]} cm`
+              dimensions = `${descMatch[1]} × ${descMatch[2]} × ${descMatch[3]} cm`
             }
 
-            // Utiliser l'image originale mais avoir un fallback en cas d'erreur
-            const imageUrl = product.cover_image || "/wooden-panel-texture.png"
-            const isExternalImage = imageUrl.startsWith("http")
+            // Utiliser l'image originale avec le composant SafeImage
+            const imageUrl = product.cover_image || ""
 
             return (
-              <tr key={product.id} className="border-b hover:bg-gray-50">
-                <td className="border p-2">{product.reference_code}</td>
-                <td className="border p-2 font-medium">{product.name}</td>
-                <td className="border p-2">
-                  <div className="relative h-24 w-24">
-                    {/* Image optimisée avec lazy loading pour l'affichage à l'écran */}
-                    <Image
-                      src={imageUrl || "/placeholder.svg"}
+              <tr 
+                key={product.id} 
+                className={`border-b border-slate-100 hover:bg-slate-50/50 transition-colors duration-150 ${
+                  index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'
+                }`}
+              >
+                <td className="border-r border-slate-100 p-4">
+                  <code className="text-sm font-mono bg-slate-100 px-2 py-1 rounded text-slate-700">
+                    {product.reference_code}
+                  </code>
+                </td>
+                <td className="border-r border-slate-100 p-4">
+                  <div className="font-semibold text-slate-900 leading-tight">
+                    {product.name}
+                  </div>
+                </td>
+                <td className="border-r border-slate-100 p-4">
+                  <div className="relative h-28 w-28 rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
+                    <SafeImage
+                      src={imageUrl}
                       alt={product.name}
                       fill
-                      className="object-cover print:hidden"
-                      sizes="96px"
-                      loading="lazy"
-                      quality={75}
-                      placeholder="blur"
-                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8A0XqoFdQowcKAQ4eGgfJ4yCyJFfSBLFLKA="
-                      onError={(e) => {
-                        // En cas d'erreur de chargement, remplacer par un placeholder
-                        const target = e.target as HTMLImageElement
-                        target.onerror = null // Éviter les boucles infinies
-                        target.src = `/placeholder.svg?height=150&width=150&query=${encodeURIComponent(product.name || "produit")}`
-                      }}
-                    />
-
-                    {/* Image standard pour l'impression uniquement */}
-                    <img
-                      src={imageUrl || "/placeholder.svg?height=150&width=150&query=produit"}
-                      alt={product.name}
-                      className="hidden print:block w-full h-full object-cover"
-                      loading="lazy"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement
-                        target.onerror = null
-                        target.src = `/placeholder.svg?height=150&width=150&query=${encodeURIComponent(product.name || "produit")}`
-                      }}
+                      className="object-cover hover:scale-105 transition-transform duration-200"
+                      sizes="112px"
+                      quality={85}
+                      productName={product.name}
                     />
                   </div>
                 </td>
-                <td className="border p-2">{dimensions}</td>
-                <td className="border p-2 font-semibold text-primary">{formatPrice(product.price_with_tax)}</td>
-                <td className="border p-2 text-sm">
-                  {product.short_description ? (
-                    <span className="line-clamp-2">{product.short_description.replace(/<[^>]*>/g, "")}</span>
-                  ) : (
-                    "-"
-                  )}
+                <td className="border-r border-slate-100 p-4">
+                  <Badge variant="outline" className="font-mono text-xs bg-blue-50 text-blue-700 border-blue-200">
+                    {dimensions}
+                  </Badge>
                 </td>
-                <td className="border p-2">
+                <td className="border-r border-slate-100 p-4">
+                  <div className="text-lg font-bold text-primary">
+                    {formatPrice(product.price_with_tax)}
+                  </div>
+                </td>
+                <td className="border-r border-slate-100 p-4">
+                  <div className="text-sm text-slate-600 leading-relaxed max-w-xs">
+                    {product.short_description ? (
+                      <span className="line-clamp-3">
+                        {product.short_description.replace(/<[^>]*>/g, "")}
+                      </span>
+                    ) : (
+                      <span className="text-slate-400 italic">Aucune description disponible</span>
+                    )}
+                  </div>
+                </td>
+                <td className="p-4">
                   {product.availability ? (
-                    <span className="text-green-600 font-medium">En stock</span>
+                    <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      En stock
+                    </Badge>
                   ) : (
-                    <span className="text-gray-500">Sur commande</span>
+                    <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
+                      <Clock className="w-3 h-3 mr-1" />
+                      Sur commande
+                    </Badge>
                   )}
                 </td>
               </tr>

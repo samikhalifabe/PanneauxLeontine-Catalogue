@@ -1,17 +1,24 @@
 import type React from "react"
 import "./globals.css"
 import type { Metadata } from "next"
-import { Montserrat } from "next/font/google"
+import { Inter, Playfair_Display } from "next/font/google"
 
-const montserrat = Montserrat({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-montserrat",
+  variable: "--font-inter",
+  display: "swap",
+})
+
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
 })
 
 export const metadata: Metadata = {
   title: "Panneaux Léontine - Catalogue de Produits",
   description: "Catalogue de panneaux en bois, planches et produits pour terrasses",
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -21,7 +28,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className={`${montserrat.variable} font-sans`}>{children}</body>
+      <body className={`${inter.variable} ${playfairDisplay.variable} font-sans antialiased`}>
+        {children}
+      </body>
     </html>
   )
 }
