@@ -3,7 +3,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase"
 import { SiteHeader } from "@/components/site-header"
 import { Button } from "@/components/ui/button"
-import { Printer } from "lucide-react"
+import { Printer, ShoppingCart, ExternalLink } from "lucide-react"
 import { formatPrice } from "@/lib/utils"
 import type { Product } from "@/types/product"
 import Link from "next/link"
@@ -105,6 +105,7 @@ export default async function CatalogueTableauSimplePage() {
                         <th className="border p-2 text-left">Prix TVAC / Pièce</th>
                         <th className="border p-2 text-left">Remarques</th>
                         <th className="border p-2 text-left">De stock à</th>
+                        <th className="border p-2 text-center print:hidden">Commander</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -156,6 +157,31 @@ export default async function CatalogueTableauSimplePage() {
                                 <span className="text-green-600 font-medium">Assesse-Chaumont</span>
                               ) : (
                                 <span className="text-gray-500">Sur commande</span>
+                              )}
+                            </td>
+                            <td className="border p-2 text-center print:hidden">
+                              {product.product_link ? (
+                                <Button
+                                  asChild
+                                  size="sm"
+                                  className="bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
+                                >
+                                  <a
+                                    href={product.product_link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1"
+                                  >
+                                    <ShoppingCart className="w-3 h-3" />
+                                    <span className="text-xs font-medium">Commander</span>
+                                    <ExternalLink className="w-2 h-2" />
+                                  </a>
+                                </Button>
+                              ) : (
+                                <div className="flex flex-col items-center gap-1 text-slate-400">
+                                  <ShoppingCart className="w-3 h-3" />
+                                  <span className="text-xs">Non disponible</span>
+                                </div>
                               )}
                             </td>
                           </tr>

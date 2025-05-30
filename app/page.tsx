@@ -6,110 +6,21 @@ import { SiteHeader } from "@/components/site-header"
 import type { Product } from "@/types/product"
 import { CatalogueTableWithSelector } from "@/components/catalogue-table-with-selector"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { getSharedSupabaseClient } from "@/lib/supabase-client"
+import { ClientProductService } from "@/lib/services/client-product-service"
+import type { ProductsByCategory, CategoryCounts } from "@/lib/services/client-product-service"
 import { Button } from "@/components/ui/button"
 import { Printer, Download, FileText, Filter } from "lucide-react"
 
-// Fonction optimisée pour récupérer tous les produits groupés par catégorie
-async function getProductsByCategory(selectedCategories?: string[]): Promise<Record<string, Product[]>> {
-  try {
-    const supabase = await getSharedSupabaseClient()
-
-    // Si des catégories spécifiques sont sélectionnées, on ne récupère que celles-ci
-    let query = supabase
-      .from("products")
-      .select("*")
-      .order("category", { ascending: true })
-      
-    // Filtrer par catégories si spécifiées
-    if (selectedCategories && selectedCategories.length > 0) {
-      query = query.in("category", selectedCategories)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      console.error("Error fetching products:", error)
-      return {}
-    }
-
-    // Grouper les produits par catégorie
-    const productsByCategory: Record<string, Product[]> = {}
-    data.forEach((product: any) => {
-      const category = product.category || "Non classé"
-      if (!productsByCategory[category]) {
-        productsByCategory[category] = []
-      }
-      productsByCategory[category].push(product)
-    })
-
-    return productsByCategory
-  } catch (error) {
-    console.error("Erreur lors de la récupération des produits:", error)
-    return {}
-  }
-}
-
-// Fonction pour récupérer uniquement les catégories disponibles avec leur nombre de produits
-async function getAvailableCategoriesWithCount(): Promise<Record<string, number>> {
-  try {
-    const supabase = await getSharedSupabaseClient()
-    
-    const { data, error } = await supabase
-      .from("products")
-      .select("category")
-      .not("category", "is", null)
-
-    if (error) {
-      console.error("Error fetching categories:", error)
-      return {}
-    }
-
-    // Compter les produits par catégorie
-    const categoryCounts: Record<string, number> = {}
-    data.forEach((item: { category: string }) => {
-      const category = item.category || "Non classé"
-      categoryCounts[category] = (categoryCounts[category] || 0) + 1
-    })
-
-    return categoryCounts
-  } catch (error) {
-    console.error("Erreur lors de la récupération des catégories:", error)
-    return {}
-  }
-}
-
-// Fonction pour récupérer uniquement les catégories disponibles
-async function getAvailableCategories(): Promise<string[]> {
-  try {
-    const supabase = await getSharedSupabaseClient()
-    
-    const { data, error } = await supabase
-      .from("products")
-      .select("category")
-      .not("category", "is", null)
-
-    if (error) {
-      console.error("Error fetching categories:", error)
-      return []
-    }
-
-    // Extraire les catégories uniques avec typage correct
-    const categories = [...new Set(data.map((item: { category: string }) => item.category))].sort()
-    return categories as string[]
-  } catch (error) {
-    console.error("Erreur lors de la récupération des catégories:", error)
-    return []
-  }
-}
-
 export default function HomePage() {
-  const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({})
+  const [productsByCategory, setProductsByCategory] = useState<ProductsByCategory>({})
   const [availableCategories, setAvailableCategories] = useState<string[]>([])
-  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
+  const [categoryCounts, setCategoryCounts] = useState<CategoryCounts>({})
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Instance du service client
+  const productService = ClientProductService.getInstance()
 
   // Chargement initial des catégories et de leurs compteurs
   useEffect(() => {
@@ -118,21 +29,18 @@ export default function HomePage() {
         setIsLoading(true)
         setError(null)
         
-        // Charger les catégories et leurs compteurs en parallèle
-        const [categories, counts] = await Promise.all([
-          getAvailableCategories(),
-          getAvailableCategoriesWithCount()
-        ])
+        // Charger les catégories et leurs compteurs avec le service client
+        const { categories, categoryCounts } = await productService.getCategoriesData()
         
         setAvailableCategories(categories)
-        setCategoryCounts(counts)
+        setCategoryCounts(categoryCounts)
         
         // Par défaut, sélectionner les 3 premières catégories pour réduire le chargement initial
         const initialCategories = categories.slice(0, 3)
         setSelectedCategories(initialCategories)
         
         // Charger seulement les produits des catégories sélectionnées
-        const products = await getProductsByCategory(initialCategories)
+        const products = await productService.getProductsByCategory(initialCategories)
         setProductsByCategory(products)
       } catch (err) {
         setError(err instanceof Error ? err.message : "Une erreur est survenue lors du chargement des données")
@@ -143,24 +51,19 @@ export default function HomePage() {
     }
 
     loadCategories()
-  }, [])
+  }, [productService])
 
   // Fonction pour charger les produits des nouvelles catégories sélectionnées
   const handleCategorySelectionChange = async (newSelectedCategories: string[]) => {
     setSelectedCategories(newSelectedCategories)
     
-    // Identifier les nouvelles catégories à charger
-    const categoriesToLoad = newSelectedCategories.filter(
-      cat => !Object.keys(productsByCategory).includes(cat)
-    )
-    
-    if (categoriesToLoad.length > 0) {
-      try {
-        const newProducts = await getProductsByCategory(categoriesToLoad)
-        setProductsByCategory(prev => ({ ...prev, ...newProducts }))
-      } catch (err) {
-        console.error("Erreur lors du chargement des nouvelles catégories:", err)
-      }
+    try {
+      // Recharger tous les produits des catégories sélectionnées
+      const products = await productService.getProductsByCategory(newSelectedCategories)
+      setProductsByCategory(products)
+    } catch (err) {
+      console.error("Erreur lors du chargement des nouvelles catégories:", err)
+      setError("Erreur lors du chargement des catégories sélectionnées")
     }
   }
 

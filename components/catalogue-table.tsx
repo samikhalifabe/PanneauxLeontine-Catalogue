@@ -3,7 +3,8 @@
 import { formatPrice } from "@/lib/utils"
 import type { Product } from "@/types/product"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Clock } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { CheckCircle, Clock, ShoppingCart, ExternalLink } from "lucide-react"
 import { SafeImage } from "@/components/safe-image"
 
 interface CatalogueTableProps {
@@ -34,8 +35,11 @@ export function CatalogueTable({ products }: CatalogueTableProps) {
             <th className="border-r border-slate-200 p-4 text-left font-semibold text-slate-700 text-sm tracking-wide">
               DESCRIPTION
             </th>
-            <th className="p-4 text-left font-semibold text-slate-700 text-sm tracking-wide">
+            <th className="border-r border-slate-200 p-4 text-left font-semibold text-slate-700 text-sm tracking-wide">
               DISPONIBILITÉ
+            </th>
+            <th className="p-4 text-center font-semibold text-slate-700 text-sm tracking-wide print:hidden">
+              COMMANDER
             </th>
           </tr>
         </thead>
@@ -109,7 +113,7 @@ export function CatalogueTable({ products }: CatalogueTableProps) {
                     )}
                   </div>
                 </td>
-                <td className="p-4">
+                <td className="border-r border-slate-100 p-4">
                   {product.availability ? (
                     <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200">
                       <CheckCircle className="w-3 h-3 mr-1" />
@@ -120,6 +124,31 @@ export function CatalogueTable({ products }: CatalogueTableProps) {
                       <Clock className="w-3 h-3 mr-1" />
                       Sur commande
                     </Badge>
+                  )}
+                </td>
+                <td className="p-4 text-center print:hidden">
+                  {product.product_link ? (
+                    <Button
+                      asChild
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
+                    >
+                      <a
+                        href={product.product_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        <span className="font-medium">Commander</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </Button>
+                  ) : (
+                    <div className="flex flex-col items-center gap-1 text-slate-400">
+                      <ShoppingCart className="w-4 h-4" />
+                      <span className="text-xs">Non disponible</span>
+                    </div>
                   )}
                 </td>
               </tr>

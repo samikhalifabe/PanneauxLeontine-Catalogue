@@ -14,61 +14,38 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 
 // Importer le bouton de téléchargement PDF
 import { PdfDownloadButton } from "@/components/pdf-download-button"
-import { getSharedSupabaseClient } from "@/lib/supabase-client"
-
-// Fonction pour récupérer tous les produits groupés par catégorie
-async function getProductsByCategory(): Promise<Record<string, Product[]>> {
-  try {
-    const supabase = await getSharedSupabaseClient()
-
-    const { data, error } = await supabase.from("products").select("*").order("category", { ascending: true })
-
-    if (error) {
-      console.error("Error fetching products:", error)
-      return {}
-    }
-
-    if (!data) {
-      return {}
-    }
-
-    // Grouper les produits par catégorie
-    const productsByCategory: Record<string, Product[]> = {}
-    data.forEach((product: any) => {
-      const category = product.category || "Non classé"
-      if (!productsByCategory[category]) {
-        productsByCategory[category] = []
-      }
-      productsByCategory[category].push(product as Product)
-    })
-
-    return productsByCategory
-  } catch (error) {
-    console.error("Erreur lors de la récupération des produits:", error)
-    return {}
-  }
-}
+import { ClientProductService } from "@/lib/services/client-product-service"
+import type { ProductsByCategory } from "@/lib/services/client-product-service"
 
 export default function CatalogueTableauPage() {
-  const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({})
+  const [productsByCategory, setProductsByCategory] = useState<ProductsByCategory>({})
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
 
+  // Instance du service client
+  const productService = ClientProductService.getInstance()
+
   useEffect(() => {
     async function loadData() {
       setIsLoading(true)
-      const data = await getProductsByCategory()
-      setProductsByCategory(data)
-      const cats = Object.keys(data).sort()
-      setCategories(cats)
-      // Par défaut, toutes les catégories sont sélectionnées
-      setSelectedCategories(new Set(cats))
-      setIsLoading(false)
+      try {
+        // Utiliser le service client
+        const data = await productService.getProductsByCategory()
+        setProductsByCategory(data)
+        const cats = Object.keys(data).sort()
+        setCategories(cats)
+        // Par défaut, toutes les catégories sont sélectionnées
+        setSelectedCategories(new Set(cats))
+      } catch (error) {
+        console.error("Erreur lors du chargement des données:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     loadData()
-  }, [])
+  }, [productService])
 
   const selectAllCategories = () => {
     setSelectedCategories(new Set(categories))
