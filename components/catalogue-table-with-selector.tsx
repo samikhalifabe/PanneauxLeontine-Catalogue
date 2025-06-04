@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import { CatalogueTable } from "@/components/catalogue-table"
 import { Button } from "@/components/ui/button"
-import { Printer, CheckSquare, Square, Filter, Search, X, Star, Loader2 } from "lucide-react"
+import { Printer, CheckSquare, Square, Filter, Search, X, Star, Loader2, Bookmark } from "lucide-react"
 import type { Product } from "@/types/product"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -271,7 +271,7 @@ export function CatalogueTableWithSelector({
     return (
       <div 
         key={category} 
-        className={`flex items-center space-x-2 p-2 rounded-lg border transition-all duration-200 cursor-pointer hover:bg-slate-50 ${
+        className={`flex items-center space-x-1.5 sm:space-x-2 p-1.5 sm:p-2 rounded-lg border transition-all duration-200 cursor-pointer hover:bg-slate-50 ${
           isSelected 
             ? (isPopular ? 'border-amber-300 bg-amber-50/50' : 'border-primary/30 bg-primary/5')
             : (isPopular ? 'border-amber-200 bg-amber-50/30 hover:bg-amber-50' : 'border-slate-200')
@@ -283,21 +283,21 @@ export function CatalogueTableWithSelector({
           className={`${isPopular 
             ? 'data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500' 
             : 'data-[state=checked]:bg-primary data-[state=checked]:border-primary'
-          }`}
+          } flex-shrink-0`}
           disabled={isUpdating || isLoading}
         />
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1">
-            <Label className={`cursor-pointer text-sm font-medium truncate block ${
+          <div className="flex items-start gap-1 flex-wrap">
+            <Label className={`cursor-pointer text-xs sm:text-sm font-medium leading-tight break-words hyphens-auto ${
               isPopular ? 'text-amber-900 font-semibold' : 'text-gray-900'
             }`}>
               {category}
             </Label>
             {isPopular && (
-              <Star className="h-3 w-3 text-amber-500 flex-shrink-0" fill="currentColor" />
+              <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-amber-500 flex-shrink-0 mt-0.5" fill="currentColor" />
             )}
             {isLoading && (
-              <Loader2 className="h-3 w-3 text-primary animate-spin flex-shrink-0" />
+              <Loader2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-primary animate-spin flex-shrink-0 mt-0.5" />
             )}
           </div>
           <span className={`text-xs ${isPopular ? 'text-amber-600' : 'text-gray-500'}`}>
@@ -312,28 +312,28 @@ export function CatalogueTableWithSelector({
   return (
     <>
       {/* Filtre compact et sticky - toujours ouvert */}
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/50 print:hidden">
-        <div className="container py-4">
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-200/50 print:hidden">
+        <div className="container py-3 sm:py-4">
           {/* Barre de contrôle compact */}
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary/10 to-primary/20 border border-primary/20">
-                  <Filter className="h-5 w-5 text-primary" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-primary/10 to-primary/20 border border-primary/20 flex-shrink-0">
+                  <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900">
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-base sm:text-lg font-bold text-gray-900 truncate">
                     Filtres et recherche
                     {(isUpdating || loadingCategories.size > 0) && (
-                      <Loader2 className="inline-block ml-2 h-4 w-4 animate-spin text-primary" />
+                      <Loader2 className="inline-block ml-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin text-primary" />
                     )}
                   </h2>
-                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
                     <span>{selectedCount}/{totalCount} catégories</span>
                     <span>•</span>
                     <span>{productSearch ? visibleProducts : totalProducts} produits</span>
                     {(isUpdating || loadingCategories.size > 0) && (
-                      <span className="text-primary text-xs font-medium">
+                      <span className="text-primary text-xs font-medium hidden sm:inline">
                         {loadingCategories.size > 0 ? `Chargement (${loadingCategories.size})...` : 'Mise à jour...'}
                       </span>
                     )}
@@ -343,80 +343,71 @@ export function CatalogueTableWithSelector({
             </div>
 
             {/* Actions d'impression */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <Button 
                 onClick={handlePrint} 
                 size="sm" 
-                className="h-8 px-4 bg-primary hover:bg-primary/90"
+                className="h-8 px-3 sm:px-4 bg-primary hover:bg-primary/90 text-xs sm:text-sm"
                 disabled={isUpdating || loadingCategories.size > 0}
               >
                 <Printer className="mr-1 h-3 w-3" />
-                Imprimer
+                <span className="hidden sm:inline">Imprimer</span>
+                <span className="sm:hidden">Imprimer</span>
               </Button>
-              <PdfDownloadButton documentTitle="Catalogue Panneaux Léontine" />
+              <PdfDownloadButton 
+                documentTitle="Catalogue Panneaux Léontine" 
+                size="sm" 
+                className="h-8 px-3 sm:px-4 text-xs sm:text-sm" 
+              />
             </div>
           </div>
 
           {/* Panel de filtrage - toujours visible */}
-          <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-200/50 space-y-6">
+          <div className="p-3 sm:p-4 bg-slate-50/50 rounded-xl border border-slate-200/50 space-y-4 sm:space-y-6">
             {/* Section filtres de catégories */}
-            <div className="space-y-4">
-              {/* Recherche de catégories */}
-              <div className="flex items-center gap-3">
-                <div className="relative flex-1 max-w-sm">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Rechercher une catégorie..."
-                    value={categorySearch}
-                    onChange={(e) => setCategorySearch(e.target.value)}
-                    className="pl-10 h-9"
-                    disabled={isUpdating}
-                  />
-                  {categorySearch && (
-                    <button
-                      onClick={() => setCategorySearch("")}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      disabled={isUpdating}
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
+            <div className="space-y-3 sm:space-y-4">
+              {/* Contrôles de sélection */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <Bookmark className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span className="text-sm font-medium text-gray-700 truncate">Catégories disponibles</span>
+                  <Badge variant="outline" className="text-xs flex-shrink-0">
+                    {categories.length}
+                  </Badge>
                 </div>
-                
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={selectAllCategories} 
-                    className="h-9 px-3"
-                    disabled={isUpdating || loadingCategories.size > 0}
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={selectAllCategories}
+                    disabled={isUpdating}
+                    className="text-xs h-7 px-2 sm:h-8 sm:px-3 sm:text-sm"
                   >
-                    {isUpdating ? (
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                    ) : (
-                      <CheckSquare className="h-4 w-4 mr-1" />
-                    )}
-                    Tout
+                    <CheckSquare className="mr-1 h-3 w-3" />
+                    <span className="hidden sm:inline">Tout sélectionner</span>
+                    <span className="sm:hidden">Tout</span>
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={deselectAllCategories} 
-                    className="h-9 px-3"
-                    disabled={isUpdating || loadingCategories.size > 0}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={deselectAllCategories}
+                    disabled={isUpdating}
+                    className="text-xs h-7 px-2 sm:h-8 sm:px-3 sm:text-sm"
                   >
-                    <Square className="h-4 w-4 mr-1" />
-                    Aucun
+                    <Square className="mr-1 h-3 w-3" />
+                    <span className="hidden sm:inline">Tout désélectionner</span>
+                    <span className="sm:hidden">Aucun</span>
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={selectPopularCategories}
-                    className="h-9 px-3"
-                    disabled={isUpdating || loadingCategories.size > 0}
+                    disabled={isUpdating}
+                    className="text-xs h-7 px-2 sm:h-8 sm:px-3 sm:text-sm"
                   >
-                    <Star className="h-4 w-4 mr-1" />
-                    Populaires
+                    <Star className="mr-1 h-3 w-3" />
+                    <span className="hidden sm:inline">Populaires</span>
+                    <span className="sm:hidden">Populaires</span>
                   </Button>
                 </div>
               </div>
@@ -447,7 +438,7 @@ export function CatalogueTableWithSelector({
                   )}
                 </div>
                 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 max-h-48 overflow-y-auto">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1.5 sm:gap-2 max-h-48 overflow-y-auto">
                   {filteredCategories.map((category) => (
                     <CategoryItem key={category} category={category} />
                   ))}
@@ -581,27 +572,29 @@ export function CatalogueTableWithSelector({
                     style={{ animationDelay: `${index * 50}ms` }} // Réduire le délai d'animation
                   >
                     <div className="flex items-center justify-between mb-6 p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-xl border border-primary/20">
-                      <div className="flex items-center gap-4">
-                        <div className="w-3 h-8 bg-gradient-to-b from-primary to-primary/70 rounded-full print:hidden"></div>
-                        <div>
-                          <h2 className="text-3xl font-display font-bold text-gray-900 print:text-black print:bg-primary print:text-white print:p-3 print:mt-8">
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        <div className="w-3 h-8 bg-gradient-to-b from-primary to-primary/70 rounded-full print:hidden flex-shrink-0"></div>
+                        <div className="min-w-0 flex-1">
+                          <h2 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 print:text-black print:bg-primary print:text-white print:p-3 print:mt-8">
                             {category}
                             {loadingCategories.has(category) && (
-                              <Loader2 className="inline-block ml-3 h-6 w-6 animate-spin text-primary print:hidden" />
+                              <Loader2 className="inline-block ml-3 h-5 w-5 sm:h-6 sm:w-6 animate-spin text-primary print:hidden" />
                             )}
                           </h2>
-                          <p className="text-sm text-gray-600 mt-1 print:hidden">
-                            {productSearch 
-                              ? `${filteredProducts.length} produit${filteredProducts.length > 1 ? 's' : ''} trouvé${filteredProducts.length > 1 ? 's' : ''}`
-                              : 'Explorez notre sélection de produits dans cette catégorie'
-                            }
-                          </p>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1 print:hidden">
+                            <p className="text-sm text-gray-600">
+                              {productSearch 
+                                ? `${filteredProducts.length} produit${filteredProducts.length > 1 ? 's' : ''} trouvé${filteredProducts.length > 1 ? 's' : ''}`
+                                : 'Explorez notre sélection de produits dans cette catégorie'
+                              }
+                            </p>
+                            <Badge variant="outline" className="text-xs px-2 py-1 bg-white border-primary/30 text-primary font-medium w-fit">
+                              {filteredProducts.length} / {allProducts.length} produit{allProducts.length > 1 ? 's' : ''}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 print:hidden">
-                        <Badge variant="outline" className="px-4 py-2 bg-white border-primary/30 text-primary font-semibold">
-                          {filteredProducts.length} / {allProducts.length} produit{allProducts.length > 1 ? 's' : ''}
-                        </Badge>
+                      <div className="flex items-center gap-2 print:hidden flex-shrink-0">
                         <div className={`w-2 h-2 rounded-full ${loadingCategories.has(category) ? 'bg-orange-500' : 'bg-green-500'} animate-pulse`}></div>
                       </div>
                     </div>

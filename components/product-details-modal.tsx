@@ -58,7 +58,7 @@ export function ProductDetailsModal({ product, isOpen, onClose }: ProductDetails
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="max-w-4xl"
+        className="max-w-4xl max-h-[90vh] overflow-y-auto"
         aria-describedby="product-details-description"
       >
         <DialogHeader>
@@ -198,7 +198,7 @@ export function ProductDetailsModal({ product, isOpen, onClose }: ProductDetails
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  Détails
+                  Informations
                   {activeTab === 'short' && (
                     <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
                   )}
@@ -212,7 +212,7 @@ export function ProductDetailsModal({ product, isOpen, onClose }: ProductDetails
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
-                    Description détaillée
+                    Détails
                     {activeTab === 'full' && (
                       <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
                     )}

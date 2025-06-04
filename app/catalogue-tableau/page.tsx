@@ -72,19 +72,22 @@ export default function CatalogueTableauPage() {
       <main className="flex-1">
         <section className="bg-gradient-to-b from-primary/10 to-background py-8">
           <div className="container">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Le Catalogue</h1>
-                <p className="mt-2 text-muted-foreground">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Le Catalogue</h1>
+                <p className="mt-2 text-muted-foreground text-sm sm:text-base">
                   Consultez notre catalogue de produits dans un format tabulaire facile à imprimer
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-2 mt-4 md:mt-0 print:hidden">
-                <Button onClick={handlePrint} size="lg" className="bg-primary hover:bg-primary/90">
-                  <Printer className="mr-2 h-4 w-4" />
-                  Imprimer les catégories sélectionnées
+              <div className="flex flex-col sm:flex-row gap-2 print:hidden">
+                <Button onClick={handlePrint} size="lg" className="bg-primary hover:bg-primary/90 text-sm sm:text-base">
+                  <Printer className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Imprimer les catégories sélectionnées</span>
+                  <span className="sm:hidden">Imprimer</span>
                 </Button>
-                <PdfDownloadButton documentTitle="Catalogue Panneaux Léontine" />
+                <div className="hidden sm:block">
+                  <PdfDownloadButton documentTitle="Catalogue Panneaux Léontine" />
+                </div>
               </div>
             </div>
           </div>
@@ -94,9 +97,9 @@ export default function CatalogueTableauPage() {
         <div className="container mt-4 print:hidden">
           <Alert className="bg-blue-50 border-blue-200 mb-4">
             <Info className="h-4 w-4 text-blue-600" />
-            <AlertDescription className="text-blue-700">
+            <AlertDescription className="text-blue-700 text-sm">
               Personnalisez votre catalogue en sélectionnant uniquement les catégories qui vous intéressent ci-dessous,
-              puis cliquez sur "Imprimer les catégories sélectionnées".
+              puis cliquez sur "Imprimer".
             </AlertDescription>
           </Alert>
         </div>
@@ -105,26 +108,32 @@ export default function CatalogueTableauPage() {
         <div className="container py-2 print:hidden">
           <Card className="border-primary/20">
             <CardHeader className="pb-3 bg-primary/5">
-              <CardTitle className="text-lg flex justify-between items-center">
+              <CardTitle className="text-base sm:text-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                 <span>Personnalisez votre impression</span>
                 <div className="text-sm font-normal text-muted-foreground">
                   {selectedCount} sur {totalCount} catégories sélectionnées
                 </div>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Cochez les catégories que vous souhaitez inclure dans votre impression ou votre PDF
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
-              <div className="flex justify-end mb-4 gap-2">
-                <Button variant="outline" size="sm" onClick={selectAllCategories}>
-                  <CheckSquare className="h-4 w-4 mr-1" /> Tout sélectionner
-                </Button>
-                <Button variant="outline" size="sm" onClick={deselectAllCategories}>
-                  <Square className="h-4 w-4 mr-1" /> Tout désélectionner
-                </Button>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                  <Button variant="outline" size="sm" onClick={selectAllCategories} className="text-xs sm:text-sm">
+                    <CheckSquare className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> 
+                    <span className="hidden sm:inline">Tout sélectionner</span>
+                    <span className="sm:hidden">Tout</span>
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={deselectAllCategories} className="text-xs sm:text-sm">
+                    <Square className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> 
+                    <span className="hidden sm:inline">Tout désélectionner</span>
+                    <span className="sm:hidden">Aucun</span>
+                  </Button>
+                </div>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {categories.map((category) => (
                   <div key={category} className="flex items-center space-x-2">
                     <Checkbox
@@ -142,7 +151,7 @@ export default function CatalogueTableauPage() {
                         }
                       }}
                     />
-                    <Label htmlFor={`category-${category}`} className="cursor-pointer">
+                    <Label htmlFor={`category-${category}`} className="cursor-pointer text-sm">
                       {category} ({productsByCategory[category]?.length || 0})
                     </Label>
                   </div>

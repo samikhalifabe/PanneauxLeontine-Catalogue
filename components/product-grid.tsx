@@ -15,7 +15,7 @@ interface ProductGridProps {
   categories: string[]
 }
 
-type ViewMode = "grid" | "list" | "compact"
+type ViewMode = "grid" | "list" | "compact" | "mobile"
 
 export function ProductGrid({ products, categories }: ProductGridProps) {
   const searchParams = useSearchParams()
@@ -26,6 +26,7 @@ export function ProductGrid({ products, categories }: ProductGridProps) {
   })
   const [searchQuery, setSearchQuery] = useState("")
   const [viewMode, setViewMode] = useState<ViewMode>("grid")
+  const [isMobile, setIsMobile] = useState(false)
 
   // Ajouter une fonction de tri par catégorie
   const sortOptions = [
@@ -45,6 +46,22 @@ export function ProductGrid({ products, categories }: ProductGridProps) {
       setFilters((prev) => ({ ...prev, category: categoryParam }))
     }
   }, [categoryParam])
+
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      // Auto-switch en mode mobile sur petits écrans, peu importe le mode actuel
+      if (mobile) {
+        setViewMode("mobile")
+      }
+    }
+    
+    checkIsMobile()
+    window.addEventListener('resize', checkIsMobile)
+    return () => window.removeEventListener('resize', checkIsMobile)
+  }, [])
 
   // Modifier la fonction de filtrage pour inclure le tri
   const filteredAndSortedProducts = products
@@ -166,15 +183,28 @@ export function ProductGrid({ products, categories }: ProductGridProps) {
             >
               <Grid className="h-4 w-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`px-3 ${viewMode === "list" ? "bg-muted" : ""}`}
-              onClick={() => setViewMode("list")}
-              title="Vue liste"
-            >
-              <List className="h-4 w-4" />
-            </Button>
+            {!isMobile && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`px-3 ${viewMode === "list" ? "bg-muted" : ""}`}
+                onClick={() => setViewMode("list")}
+                title="Vue liste"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            )}
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`px-3 ${viewMode === "mobile" ? "bg-muted" : ""}`}
+                onClick={() => setViewMode("mobile")}
+                title="Vue mobile optimisée"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -217,6 +247,12 @@ export function ProductGrid({ products, categories }: ProductGridProps) {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {filteredAndSortedProducts.map((product) => (
             <ProductCompactCard key={product.id} product={product} />
+          ))}
+        </div>
+      ) : viewMode === "mobile" ? (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          {filteredAndSortedProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       ) : (

@@ -8,9 +8,11 @@ import html2canvas from 'html2canvas'
 
 interface PdfDownloadButtonProps {
   documentTitle: string
+  size?: "sm" | "lg" | "default"
+  className?: string
 }
 
-export function PdfDownloadButton({ documentTitle }: PdfDownloadButtonProps) {
+export function PdfDownloadButton({ documentTitle, size = "lg", className }: PdfDownloadButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false)
 
   const handleDownload = async () => {
@@ -248,9 +250,17 @@ export function PdfDownloadButton({ documentTitle }: PdfDownloadButtonProps) {
   }
 
   return (
-    <Button onClick={handleDownload} disabled={isGenerating} variant="outline" size="lg" className="bg-white hover:bg-gray-50 border-gray-300 hover:border-gray-400 shadow-lg hover:shadow-xl transition-all duration-200">
-      <FileDown className="mr-2 h-4 w-4" />
-      <span className="font-semibold">{isGenerating ? "Génération en cours..." : "Exporter PDF"}</span>
+    <Button 
+      onClick={handleDownload} 
+      disabled={isGenerating} 
+      variant="outline" 
+      size={size} 
+      className={`bg-white hover:bg-gray-50 border-gray-300 hover:border-gray-400 transition-all duration-200 ${className || ''}`}
+    >
+      <FileDown className={`mr-2 ${size === "sm" ? "h-3 w-3" : "h-4 w-4"}`} />
+      <span className={`${size === "sm" ? "text-xs sm:text-sm" : ""} font-semibold`}>
+        {isGenerating ? "..." : (size === "sm" ? "PDF" : "Exporter PDF")}
+      </span>
     </Button>
   )
 }

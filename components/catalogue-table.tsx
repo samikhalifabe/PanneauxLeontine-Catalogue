@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { formatPrice } from "@/lib/utils"
 import type { Product } from "@/types/product"
 import { Badge } from "@/components/ui/badge"
@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button"
 import { CheckCircle, Clock, ShoppingCart, ExternalLink, Eye } from "lucide-react"
 import { SafeImage } from "@/components/safe-image"
 import { ProductDetailsModal } from "@/components/product-details-modal"
+import { ProductCompactCard } from "@/components/product-compact-card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import Link from "next/link"
 
 interface CatalogueTableProps {
   products: Product[]
@@ -16,6 +19,18 @@ interface CatalogueTableProps {
 export function CatalogueTable({ products }: CatalogueTableProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkIsMobile()
+    window.addEventListener('resize', checkIsMobile)
+    return () => window.removeEventListener('resize', checkIsMobile)
+  }, [])
 
   const openModal = (product: Product) => {
     setSelectedProduct(product)
@@ -27,6 +42,75 @@ export function CatalogueTable({ products }: CatalogueTableProps) {
     setSelectedProduct(null)
   }
 
+  // Vue mobile : cartes optimisées custom
+  if (isMobile) {
+    return (
+      <>
+        <div className="grid grid-cols-2 gap-3 p-3">
+          {products.map((product) => (
+            <Card key={product.id} className="overflow-hidden transition-all hover:shadow-md border-gray-200">
+              <button 
+                onClick={() => openModal(product)}
+                className="block w-full text-left"
+              >
+                <div className="relative aspect-square overflow-hidden">
+                  <SafeImage
+                    src={product.cover_image || "/placeholder.svg?height=200&width=200&query=panneau+en+bois"}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform hover:scale-105"
+                    sizes="(max-width: 640px) 50vw, 200px"
+                    quality={75}
+                    productName={product.name}
+                  />
+                  {product.availability ? (
+                    <Badge variant="default" className="absolute top-2 right-2 z-10 text-xs">
+                      En stock
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary" className="absolute top-2 right-2 z-10 text-xs">
+                      Sur commande
+                    </Badge>
+                  )}
+                </div>
+                <CardContent className="p-3">
+                  <div className="mb-2">
+                    <h3 className="font-semibold text-sm line-clamp-2 text-gray-800 leading-tight">
+                      {product.name}
+                    </h3>
+                  </div>
+                  {product.short_description && (
+                    <div className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                      {product.short_description.replace(/<[^>]*>/g, "")}
+                    </div>
+                  )}
+                  <div className="text-xs text-muted-foreground">Réf: {product.reference_code}</div>
+                </CardContent>
+                <CardFooter className="flex items-center justify-between border-t p-3 bg-gray-50">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-primary">{formatPrice(product.price_with_tax)}</span>
+                    <span className="text-xs text-muted-foreground">TTC</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground text-right">
+                    {product.quantity > 0 ? `${product.quantity} dispo.` : "Sur commande"}
+                  </div>
+                </CardFooter>
+              </button>
+            </Card>
+          ))}
+        </div>
+
+        {/* Modal de détails du produit */}
+        <ProductDetailsModal
+          product={selectedProduct}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+        />
+      </>
+    )
+  }
+
+  // Vue desktop : tableau actuel
   return (
     <>
       <div className="overflow-x-auto">
