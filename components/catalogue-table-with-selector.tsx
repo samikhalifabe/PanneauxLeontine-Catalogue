@@ -188,13 +188,13 @@ export function CatalogueTableWithSelector({
     if (isUpdating) return
     setIsUpdating(true)
     
-    // Délai plus court pour les actions globales
+    // Délai plus court pour les actions globales et réduire les animations
     setTimeout(() => {
       const newSelection = new Set(categories)
       setSelectedCategories(newSelection)
       onCategorySelectionChange?.(Array.from(newSelection))
       setIsUpdating(false)
-    }, 50)
+    }, 25) // Réduire de 50ms à 25ms
   }, [categories, onCategorySelectionChange, isUpdating])
 
   const deselectAllCategories = useCallback(() => {
@@ -206,7 +206,7 @@ export function CatalogueTableWithSelector({
       setSelectedCategories(newSelection)
       onCategorySelectionChange?.(Array.from(newSelection))
       setIsUpdating(false)
-    }, 50)
+    }, 25) // Réduire de 50ms à 25ms
   }, [onCategorySelectionChange, isUpdating])
 
   const selectPopularCategories = useCallback(() => {
@@ -218,7 +218,7 @@ export function CatalogueTableWithSelector({
       setSelectedCategories(newSelection)
       onCategorySelectionChange?.(Array.from(newSelection))
       setIsUpdating(false)
-    }, 50)
+    }, 25) // Réduire de 50ms à 25ms
   }, [popularCategories, onCategorySelectionChange, isUpdating])
 
   const handlePrint = useCallback(() => {
@@ -569,7 +569,7 @@ export function CatalogueTableWithSelector({
                     key={category}
                     id={`category-${category.replace(/\s+/g, "-").toLowerCase()}`}
                     className="print:break-inside-avoid-page animate-fade-in scroll-mt-32"
-                    style={{ animationDelay: `${index * 50}ms` }} // Réduire le délai d'animation
+                    style={{ animationDelay: `${index * 25}ms` }} // Réduire le délai d'animation de 50ms à 25ms
                   >
                     <div className="flex items-center justify-between mb-6 p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-xl border border-primary/20">
                       <div className="flex items-center gap-4 flex-1 min-w-0">
