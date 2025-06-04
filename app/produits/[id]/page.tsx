@@ -6,6 +6,7 @@ import { createServerSupabaseClient } from "@/lib/supabase"
 import { SiteHeader } from "@/components/site-header"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { ProductGallery } from "@/components/product-gallery"
 import { formatPrice, sanitizeHtml } from "@/lib/utils"
 import type { Product } from "@/types/product"
 
@@ -34,6 +35,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound()
   }
 
+  // Préparer toutes les images disponibles pour la galerie
+  const images = [
+    { src: product.cover_image, alt: product.name },
+    { src: product.image_2, alt: `${product.name} - Vue 2` },
+    { src: product.image_3, alt: `${product.name} - Vue 3` },
+    { src: product.image_4, alt: `${product.name} - Vue 4` },
+    { src: product.image_5, alt: `${product.name} - Vue 5` },
+  ]
+
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
@@ -46,41 +56,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </Link>
           </div>
           <div className="grid gap-8 md:grid-cols-2">
+            {/* Galerie d'images */}
             <div className="space-y-4">
-              <div className="relative aspect-square overflow-hidden rounded-lg border">
-                <Image
-                  src={product.cover_image || "/placeholder.svg?height=600&width=600&query=panneau+en+bois"}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  priority
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                {product.image_2 && (
-                  <div className="relative aspect-square overflow-hidden rounded-lg border">
-                    <Image
-                      src={product.image_2 || "/placeholder.svg"}
-                      alt={`${product.name} - Vue supplémentaire 1`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                    />
-                  </div>
-                )}
-                {product.image_3 && (
-                  <div className="relative aspect-square overflow-hidden rounded-lg border">
-                    <Image
-                      src={product.image_3 || "/placeholder.svg"}
-                      alt={`${product.name} - Vue supplémentaire 2`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                    />
-                  </div>
-                )}
-              </div>
+              <ProductGallery images={images} productName={product.name} />
             </div>
             <div className="space-y-6">
               <div>
@@ -95,17 +73,37 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   <span className="text-sm text-muted-foreground">Réf: {product.reference_code}</span>
                 </div>
               </div>
-              <div className="space-y-2">
-                <h2 className="font-semibold">Description</h2>
-                {product.short_description ? (
+              
+              {/* Description courte */}
+              {product.short_description && (
+                <div className="space-y-2">
+                  <h2 className="font-semibold">Description courte</h2>
                   <div
                     className="text-muted-foreground description-html"
                     dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.short_description) }}
                   />
-                ) : (
+                </div>
+              )}
+
+              {/* Description complète */}
+              {product.description && (
+                <div className="space-y-2">
+                  <h2 className="font-semibold">Description détaillée</h2>
+                  <div
+                    className="text-muted-foreground description-html prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.description) }}
+                  />
+                </div>
+              )}
+
+              {/* Si aucune description n'est disponible */}
+              {!product.short_description && !product.description && (
+                <div className="space-y-2">
+                  <h2 className="font-semibold">Description</h2>
                   <p className="text-muted-foreground">Aucune description disponible</p>
-                )}
-              </div>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <h2 className="font-semibold">Informations</h2>
                 <dl className="grid grid-cols-1 gap-2 sm:grid-cols-2">

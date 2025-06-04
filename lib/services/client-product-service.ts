@@ -95,6 +95,37 @@ export class ClientProductService {
   }
 
   /**
+   * Récupère le nombre unique de produits pour les catégories sélectionnées
+   */
+  async getUniqueProductsCount(selectedCategories?: string[]): Promise<number> {
+    const cacheKey = `unique-count-${selectedCategories?.join(',') || 'all'}`
+    
+    if (this.isCacheValid(cacheKey)) {
+      return this.getCache(cacheKey)
+    }
+
+    try {
+      const params = new URLSearchParams()
+      if (selectedCategories && selectedCategories.length > 0) {
+        params.set('categories', selectedCategories.join(','))
+      }
+
+      const response = await fetch(`/api/products/count?${params.toString()}`)
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.error || 'Erreur lors de la récupération du nombre de produits')
+      }
+
+      this.setCache(cacheKey, result.count)
+      return result.count
+    } catch (error) {
+      console.error('Erreur lors de la récupération du nombre de produits:', error)
+      throw error
+    }
+  }
+
+  /**
    * Vide le cache
    */
   clearCache(): void {

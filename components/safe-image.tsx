@@ -69,6 +69,8 @@ export function SafeImage({
 
   const handleImageError = () => {
     console.log(`SafeImage: Erreur de chargement pour ${src}`)
+    console.log(`SafeImage: URL valide: ${isValidImageUrl(src)}`)
+    console.log(`SafeImage: URL vide: ${!src || src.trim() === ''}`)
     setImageError(true)
     setIsLoading(false)
     onError?.()
@@ -142,7 +144,7 @@ export function SafeImage({
         onLoad={handleImageLoad}
         placeholder="blur"
         blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8A0XqoFdQowcKAQ4eGgfJ4yCyJFfSBLFLKA="
-        unoptimized={false}
+        unoptimized={true}
       />
     </div>
   )

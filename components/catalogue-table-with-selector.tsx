@@ -62,20 +62,58 @@ export function CatalogueTableWithSelector({
     }
   }, [externalSelectedCategories])
 
-  // Filtrer les catégories par recherche
-  const filteredCategories = useMemo(() => {
-    if (!categorySearch) return categories
-    return categories.filter(category => 
-      category.toLowerCase().includes(categorySearch.toLowerCase())
-    )
-  }, [categories, categorySearch])
-
   // Catégories populaires (les plus grandes)
   const popularCategories = useMemo(() => {
-    return categories
+    // Mettre "Fin de stock - OUTLET" en priorité si elle existe
+    const outletCategory = categories.find(cat => cat === "Fin de stock - OUTLET")
+    
+    // Trier les autres catégories par nombre de produits
+    const otherCategories = categories
+      .filter(cat => cat !== outletCategory)
       .sort((a, b) => (categoryCounts[b] || 0) - (categoryCounts[a] || 0))
-      .slice(0, 6)
+      .slice(0, outletCategory ? 5 : 6) // 5 autres si outlet existe, sinon 6
+    
+    // Retourner fin de stock en premier, puis les autres
+    return outletCategory ? [outletCategory, ...otherCategories] : otherCategories
   }, [categories, categoryCounts])
+
+  // Filtrer les catégories par recherche
+  const filteredCategories = useMemo(() => {
+    let categoriesToShow = categories
+    
+    if (categorySearch) {
+      categoriesToShow = categories.filter(category => 
+        category.toLowerCase().includes(categorySearch.toLowerCase())
+      )
+    }
+    
+    // Trier les catégories avec priorités :
+    // 1. "Fin de stock - OUTLET" en premier
+    // 2. Catégories populaires ensuite
+    // 3. Reste par ordre alphabétique
+    return categoriesToShow.sort((a, b) => {
+      const outletCategory = "Fin de stock - OUTLET"
+      
+      // "Fin de stock - OUTLET" en premier
+      if (a === outletCategory) return -1
+      if (b === outletCategory) return 1
+      
+      // Ensuite les catégories populaires (en excluant outlet qui est déjà en premier)
+      const aIsPopular = popularCategories.includes(a) && a !== outletCategory
+      const bIsPopular = popularCategories.includes(b) && b !== outletCategory
+      
+      if (aIsPopular && !bIsPopular) return -1
+      if (!aIsPopular && bIsPopular) return 1
+      
+      // Si les deux sont populaires, les trier par nombre de produits (décroissant)
+      if (aIsPopular && bIsPopular) {
+        return (categoryCounts[b] || 0) - (categoryCounts[a] || 0)
+      }
+      
+      // Pour le reste, tri alphabétique
+      return a.localeCompare(b)
+    })
+  }, [categories, categorySearch, popularCategories, categoryCounts])
 
   // Filtrer les produits par recherche avec memoization
   const filterProductsBySearch = useCallback((products: Product[]) => {
@@ -201,9 +239,18 @@ export function CatalogueTableWithSelector({
   // Calculer le nombre de catégories sélectionnées
   const selectedCount = selectedCategories.size
   const totalCount = categories.length
-  const totalProducts = Array.from(selectedCategories).reduce((sum, cat) => 
-    sum + (categoryCounts[cat] || productsByCategory[cat]?.length || 0), 0
-  )
+  const totalProducts = useMemo(() => {
+    const uniqueProductIds = new Set<string>()
+    
+    selectedCategories.forEach(category => {
+      const products = productsByCategory[category] || []
+      products.forEach(product => {
+        uniqueProductIds.add(product.id.toString())
+      })
+    })
+    
+    return uniqueProductIds.size
+  }, [productsByCategory, selectedCategories])
 
   // Calculer le nombre de produits visibles après recherche avec memoization
   const visibleProducts = useMemo(() => {

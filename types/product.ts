@@ -3,6 +3,7 @@ export interface Product {
   name: string
   name_with_combination?: string
   short_description?: string
+  description?: string
   reference_code: string
   availability: boolean
   quantity: number
@@ -13,6 +14,9 @@ export interface Product {
   cover_image?: string
   image_2?: string
   image_3?: string
+  image_4?: string
+  image_5?: string
+  image_urls?: string
   category?: string
   created_at: string
   updated_at: string

@@ -12,10 +12,11 @@ import { Button } from "@/components/ui/button"
 import { Printer, Download, FileText, Filter } from "lucide-react"
 
 export default function HomePage() {
-  const [productsByCategory, setProductsByCategory] = useState<ProductsByCategory>({})
   const [availableCategories, setAvailableCategories] = useState<string[]>([])
-  const [categoryCounts, setCategoryCounts] = useState<CategoryCounts>({})
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [productsByCategory, setProductsByCategory] = useState<ProductsByCategory>({})
+  const [totalUniqueProducts, setTotalUniqueProducts] = useState<number>(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -34,6 +35,10 @@ export default function HomePage() {
         
         setAvailableCategories(categories)
         setCategoryCounts(categoryCounts)
+        
+        // Charger le nombre total unique de produits
+        const totalCount = await productService.getUniqueProductsCount()
+        setTotalUniqueProducts(totalCount)
         
         // Par défaut, sélectionner les 3 premières catégories pour réduire le chargement initial
         const initialCategories = categories.slice(0, 3)
@@ -111,7 +116,7 @@ export default function HomePage() {
                   </span>
                   <span className="flex items-center gap-2 text-gray-600">
                     <FileText className="h-4 w-4 text-green-600" />
-                    {Object.values(categoryCounts).reduce((sum, count) => sum + count, 0)} produits
+                    {totalUniqueProducts} produits
                   </span>
                 </div>
               </div>
