@@ -515,71 +515,66 @@ export function CatalogueTableWithSelector({
 
             {/* Contenu du modal avec scroll */}
             <div className="flex-1 overflow-y-auto">
-              <div className="p-4 space-y-6">
-                {/* Actions rapides */}
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-gray-900">Actions rapides</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={selectPopularCategories}
-                      disabled={isUpdating}
-                      className="h-12 flex flex-col items-center justify-center gap-1"
-                    >
-                      <Star className="h-4 w-4" />
-                      <span className="text-xs">Populaires</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={deselectAllCategories}
-                      disabled={isUpdating}
-                      className="h-12 flex flex-col items-center justify-center gap-1"
-                    >
-                      <Square className="h-4 w-4" />
-                      <span className="text-xs">Aucune</span>
-                    </Button>
-                  </div>
+              <div className="p-4 space-y-4">
+                {/* Actions rapides condensées */}
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={selectPopularCategories}
+                    disabled={isUpdating}
+                    className="h-10 flex items-center justify-center gap-2 rounded-xl border-amber-200 text-amber-700 hover:bg-amber-50"
+                  >
+                    <Star className="h-3 w-3" fill="currentColor" />
+                    <span className="text-xs font-medium">Populaires</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={deselectAllCategories}
+                    disabled={isUpdating}
+                    className="h-10 flex items-center justify-center gap-2 rounded-xl border-gray-300 text-gray-600 hover:bg-gray-50"
+                  >
+                    <Square className="h-3 w-3" />
+                    <span className="text-xs font-medium">Aucune</span>
+                  </Button>
                 </div>
 
-                {/* Recherche unifiée - produits et catégories */}
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-gray-900">Recherchez un produit ou une catégorie</h3>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      placeholder="Nom, description, référence ou catégorie..."
-                      value={productSearch}
-                      onChange={(e) => setProductSearch(e.target.value)}
-                      className="pl-10 h-12 bg-gray-50 border-0 rounded-xl"
+                {/* Recherche unifiée condensée */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Rechercher produits ou catégories..."
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    className="pl-10 h-11 bg-gray-50 border-0 rounded-xl text-sm"
+                    disabled={isUpdating}
+                  />
+                  {productSearch && (
+                    <button
+                      onClick={() => setProductSearch("")}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                       disabled={isUpdating}
-                    />
-                    {productSearch && (
-                      <button
-                        onClick={() => setProductSearch("")}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                        disabled={isUpdating}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                  {productSearch && selectedCount > 0 && (
-                    <div className="text-xs text-gray-600 bg-blue-50 px-3 py-2 rounded-lg">
-                      <span className="font-medium">
-                        {visibleProducts} produit{visibleProducts !== 1 ? 's' : ''} trouvé{visibleProducts !== 1 ? 's' : ''}
-                      </span>
-                      {visibleProducts !== totalProducts && (
-                        <span> dans les catégories sélectionnées</span>
-                      )}
-                    </div>
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   )}
                 </div>
+                
+                {productSearch && selectedCount > 0 && (
+                  <div className="text-xs text-gray-600 bg-blue-50 px-3 py-2 rounded-lg">
+                    <span className="font-medium">
+                      {visibleProducts} produit{visibleProducts !== 1 ? 's' : ''} trouvé{visibleProducts !== 1 ? 's' : ''}
+                    </span>
+                    {visibleProducts !== totalProducts && (
+                      <span> dans les catégories sélectionnées</span>
+                    )}
+                  </div>
+                )}
 
                 {/* Liste des catégories en mini-cartes plus petites */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
+                <div className="flex-1 flex flex-col min-h-0">
+                  <div className="flex items-center justify-between mb-3">
                     <h3 className="font-semibold text-gray-900">Catégories</h3>
                     <span className="text-sm text-gray-500">
                       {productSearch 
@@ -589,10 +584,15 @@ export function CatalogueTableWithSelector({
                     </span>
                   </div>
                   
-                  <div className="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto">
-                    {filteredCategories.map((category) => (
-                      <CategoryMobileCard key={category} category={category} />
-                    ))}
+                  <div className="relative flex-1 min-h-0">
+                    <div className="grid grid-cols-3 gap-2 h-full overflow-y-auto pb-4">
+                      {filteredCategories.map((category) => (
+                        <CategoryMobileCard key={category} category={category} />
+                      ))}
+                    </div>
+                    
+                    {/* Dégradé de fondu en bas */}
+                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none"></div>
                   </div>
                 </div>
               </div>
