@@ -915,11 +915,12 @@ export function CatalogueTableWithSelector({
             className="h-16 w-16 rounded-full bg-primary hover:bg-primary/90 text-white shadow-2xl transition-all duration-200 relative"
           >
             <div className="flex flex-col items-center">
-              <Filter className="h-6 w-6" />
+              <Filter className="h-5 w-5" />
+              <span className="text-xs font-medium mt-0.5">Filtre</span>
               {selectedCount > 0 && (
-                <span className="text-xs font-bold mt-1">
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
                   {selectedCount}
-                </span>
+                </div>
               )}
             </div>
           </Button>

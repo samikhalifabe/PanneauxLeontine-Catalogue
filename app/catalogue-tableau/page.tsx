@@ -22,6 +22,8 @@ export default function CatalogueTableauPage() {
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
+  const [loadingProgress, setLoadingProgress] = useState<number>(0)
+  const [loadingStep, setLoadingStep] = useState<string>("Initialisation...")
 
   // Instance du service client
   const productService = ClientProductService.getInstance()
@@ -29,14 +31,31 @@ export default function CatalogueTableauPage() {
   useEffect(() => {
     async function loadData() {
       setIsLoading(true)
+      setLoadingProgress(0)
+      setLoadingStep("Connexion à la base de données...")
+      
       try {
+        setLoadingProgress(20)
+        await new Promise(resolve => setTimeout(resolve, 200))
+        
+        setLoadingStep("Récupération des produits...")
+        setLoadingProgress(40)
         // Utiliser le service client
         const data = await productService.getProductsByCategory()
+        
+        setLoadingStep("Organisation par catégories...")
+        setLoadingProgress(70)
         setProductsByCategory(data)
         const cats = Object.keys(data).sort()
         setCategories(cats)
+        
+        setLoadingStep("Préparation de l'affichage...")
+        setLoadingProgress(90)
         // Par défaut, toutes les catégories sont sélectionnées
         setSelectedCategories(new Set(cats))
+        
+        setLoadingProgress(100)
+        await new Promise(resolve => setTimeout(resolve, 200))
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error)
       } finally {
@@ -186,8 +205,61 @@ export default function CatalogueTableauPage() {
 
         <div className="container py-6">
           {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <p>Chargement du catalogue...</p>
+            <div className="flex min-h-[400px] items-center justify-center">
+              <div className="w-full max-w-sm">
+                {/* Spinner principal avec double rotation */}
+                <div className="flex justify-center mb-6">
+                  <div className="loading-spinner-complex">
+                    <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                    <div className="absolute inset-1 w-10 h-10 border-4 border-transparent border-r-primary/40 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+                    <div className="absolute inset-3 w-6 h-6 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+
+                {/* Message de chargement */}
+                <div className="text-center mb-6">
+                  <p className="font-semibold text-gray-900 mb-2 animate-fade-in">{loadingStep}</p>
+                  <div className="flex items-center justify-center gap-2 text-sm mb-3" style={{ animationDelay: '0.2s' }}>
+                    <span className="font-medium text-primary">{Math.round(loadingProgress)}%</span>
+                    <span className="text-gray-500">•</span>
+                    <span className="text-gray-600">
+                      {loadingProgress < 30 ? "Initialisation" : 
+                       loadingProgress < 60 ? "Chargement des données" :
+                       loadingProgress < 90 ? "Organisation" : "Finalisation"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Skeleton pour preview du tableau */}
+                <div className="bg-white rounded-xl border shadow-sm p-4 space-y-3 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 bg-primary/20 rounded loading-skeleton"></div>
+                    <div className="h-4 bg-gray-200 rounded flex-1 loading-skeleton"></div>
+                  </div>
+                  <div className="space-y-2">
+                    {[1,2,3,4].map(i => (
+                      <div key={i} className="grid grid-cols-4 gap-3 loading-state" style={{ animationDelay: `${i * 0.1}s` }}>
+                        <div className="h-8 bg-gray-100 rounded loading-skeleton"></div>
+                        <div className="h-8 bg-gray-100 rounded loading-skeleton"></div>
+                        <div className="h-8 bg-gray-100 rounded loading-skeleton"></div>
+                        <div className="h-8 bg-gray-100 rounded loading-skeleton"></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Indicateur de progression réel */}
+                <div className="mt-6 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out relative overflow-hidden"
+                      style={{ width: `${loadingProgress}%` }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <>

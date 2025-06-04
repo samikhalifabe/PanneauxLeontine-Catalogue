@@ -35,7 +35,7 @@ export function SiteHeader() {
               className="flex items-center gap-2"
             >
               <ShoppingCart className="h-5 w-5" />
-              <span>Visiter notre E-Shop</span>
+              <span>E-shop</span>
               <ExternalLink className="h-4 w-4 ml-1" />
             </Link>
           </Button>
