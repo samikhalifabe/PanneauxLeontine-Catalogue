@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -18,6 +18,10 @@ interface ProductDetailsModalProps {
 export function ProductDetailsModal({ product, isOpen, onClose }: ProductDetailsModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [activeTab, setActiveTab] = useState<'short' | 'full'>('short')
+
+  useEffect(() => {
+    setCurrentImageIndex(0)
+  }, [product])
 
   if (!product) return null
 
