@@ -248,23 +248,15 @@ export default function HomePage() {
               </div>
               
               {/* Actions d'impression pour mobile */}
-              <div className="flex md:hidden gap-2">
-                <Button
-                  onClick={() => window.print()}
-                  size="sm"
-                  className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl shadow-sm"
-                >
-                  <Printer className="mr-2 h-3 w-3" />
-                  <span className="text-xs">Imprimer</span>
-                </Button>
+              <div className="flex md:hidden">
                 <Button
                   asChild
                   size="sm"
-                  className="bg-primary/90 hover:bg-primary text-white rounded-xl shadow-sm"
+                  className="w-full bg-primary/90 hover:bg-primary text-white rounded-xl shadow-sm"
                 >
                   <Link href="/catalogue-tableau">
                     <FileText className="mr-2 h-3 w-3" />
-                    <span className="text-xs">Tableau</span>
+                    <span className="text-xs">Générer votre catalogue personnalisé</span>
                   </Link>
                 </Button>
               </div>
