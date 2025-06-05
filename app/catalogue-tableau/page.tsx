@@ -113,10 +113,10 @@ const SplashScreenLoader = memo(({ message = "Chargement..." }: { message?: stri
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/3 rounded-full animate-ping" style={{ animationDuration: '3s' }}></div>
       </div>
 
-      <div className="relative flex flex-col items-center">
+      <div className="relative flex flex-col items-center justify-center h-full w-full">
         {/* Cercle avec logo au centre */}
-        <div className="relative mb-8">
-          <div className="w-32 h-32 relative flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center">
+          <div className="w-32 h-32 relative flex items-center justify-center mb-6">
             {/* Cercle externe */}
             <div className="absolute inset-0 border-4 border-white/20 rounded-full"></div>
             {/* Cercle animé */}
@@ -135,10 +135,7 @@ const SplashScreenLoader = memo(({ message = "Chargement..." }: { message?: stri
               />
             </div>
           </div>
-        </div>
 
-        {/* Message et points animés */}
-        <div className="text-center">
           {/* Points de chargement style iOS */}
           <div className="flex justify-center space-x-2">
             {[...Array(3)].map((_, i) => (
@@ -446,12 +443,12 @@ export default function CatalogueTableauPage() {
               })}
             </div>
           </div>
-
-          {/* Section de chargement - optimisée sans espace supplémentaire */}
-          {isLoading && (
-            <SplashScreenLoader message={loadingStep} />
-          )}
         </div>
+
+        {/* Splashscreen de chargement initial - DOIT être en dehors des conteneurs avec padding */}
+        {isLoading && (
+          <SplashScreenLoader message={loadingStep} />
+        )}
 
         {/* Bottom Action Bar - Fixed Mobile Style */}
         {selectedCount > 0 && (

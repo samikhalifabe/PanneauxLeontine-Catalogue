@@ -114,11 +114,11 @@ export default function HomePage() {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/3 rounded-full animate-ping" style={{ animationDuration: '3s' }}></div>
         </div>
 
-        <div className="relative flex flex-col items-center">
+        <div className="relative flex flex-col items-center justify-center h-full w-full">
           {/* Logo avec spinner séparé en dessous */}
-          <div className="relative mb-12 flex flex-col items-center">
+          <div className="flex flex-col items-center justify-center">
             {/* Logo au-dessus - plus grand et plus haut */}
-            <div className="mb-12">
+            <div className="mb-8">
               <Image 
                 src="/logo-white-pl.png" 
                 alt="Panneaux Léontine" 
@@ -135,7 +135,7 @@ export default function HomePage() {
             </div>
 
             {/* Spinner circulaire en dessous avec pourcentage au centre */}
-            <div className="w-32 h-32 relative flex items-center justify-center">
+            <div className="w-32 h-32 relative flex items-center justify-center mb-8">
               {/* Cercle externe */}
               <div className="absolute inset-0 border-4 border-white/20 rounded-full"></div>
               {/* Cercle animé */}
@@ -148,10 +148,7 @@ export default function HomePage() {
                 </span>
               </div>
             </div>
-          </div>
 
-          {/* Message et points animés */}
-          <div className="text-center">
             {/* Points de chargement style iOS */}
             <div className="flex justify-center space-x-2 mb-4">
               {[...Array(3)].map((_, i) => (
@@ -172,16 +169,6 @@ export default function HomePage() {
                loadingProgress < 50 ? "Récupération des données" :
                loadingProgress < 75 ? "Traitement" :
                loadingProgress < 90 ? "Chargement du contenu" : "Presque terminé"}
-            </div>
-          </div>
-
-          {/* Barre de progression en bas */}
-          <div className="fixed bottom-12 left-8 right-8">
-            <div className="bg-white/20 rounded-full h-1 overflow-hidden backdrop-blur-sm">
-              <div 
-                className="h-full bg-gradient-to-r from-white via-white/90 to-white/70 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${loadingProgress}%` }}
-              ></div>
             </div>
           </div>
         </div>
