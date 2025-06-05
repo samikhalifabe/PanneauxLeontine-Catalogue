@@ -94,7 +94,59 @@ const MobileAppLoader = memo(({ message = "Mise à jour..." }: { message?: strin
   </div>
 ))
 
-MobileAppLoader.displayName = 'MobileAppLoader'
+// Splashscreen Loader style App Mobile
+const SplashScreenLoader = memo(({ message = "Chargement..." }: { message?: string }) => {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: '#c1343b' }}>
+      {/* Patterns de fond animés */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/3 rounded-full animate-ping" style={{ animationDuration: '3s' }}></div>
+      </div>
+
+      <div className="relative flex flex-col items-center">
+        {/* Cercle avec logo au centre */}
+        <div className="relative mb-8">
+          <div className="w-32 h-32 relative flex items-center justify-center">
+            {/* Cercle externe */}
+            <div className="absolute inset-0 border-4 border-white/20 rounded-full"></div>
+            {/* Cercle animé */}
+            <div className="absolute inset-0 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+            
+            {/* Logo au centre */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <img 
+                src="/logo-solo-white-pl.png"
+                alt="Panneaux Léontine" 
+                className="h-12 w-auto"
+                onError={(e) => {
+                  // Fallback au logo normal si le solo blanc n'existe pas
+                  e.currentTarget.src = "/logo-white-pl.png"
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Message et points animés */}
+        <div className="text-center">
+          {/* Points de chargement style iOS */}
+          <div className="flex justify-center space-x-2">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="w-2 h-2 bg-white rounded-full animate-bounce"
+                style={{ 
+                  animationDelay: `${i * 0.2}s`,
+                  animationDuration: '1.2s'
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+})
 
 // Loader inline simplifié
 const InlineLoader = memo(() => (
@@ -116,14 +168,21 @@ const ButtonSpinner = memo(() => (
 
 ButtonSpinner.displayName = 'ButtonSpinner'
 
+MobileAppLoader.displayName = 'MobileAppLoader'
+SplashScreenLoader.displayName = 'SplashScreenLoader'
+
 export default function CatalogueTableauPage() {
   const [productsByCategory, setProductsByCategory] = useState<ProductsByCategory>({})
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [isMajorUpdate, setIsMajorUpdate] = useState(false)
   const [loadingProgress, setLoadingProgress] = useState<number>(0)
   const [loadingStep, setLoadingStep] = useState<string>("Initialisation...")
+
+  // Debug logs
+  console.log("🔍 Component state:", { isLoading, isUpdating, isMajorUpdate, loadingStep })
 
   // Instance du service client
   const productService = ClientProductService.getInstance()
@@ -195,24 +254,28 @@ export default function CatalogueTableauPage() {
   // Fonctions optimisées avec useCallback
   const selectAllCategories = useCallback(async () => {
     setIsUpdating(true)
+    setIsMajorUpdate(true)
     try {
-      // Petit délai pour les grosses sélections
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 800))
       setSelectedCategories(new Set(categories))
     } finally {
       setIsUpdating(false)
+      setIsMajorUpdate(false)
     }
   }, [categories])
 
   const deselectAllCategories = useCallback(async () => {
     setIsUpdating(true)
+    const willBeMajorUpdate = selectedCategories.size > 5 // Calculer avant
+    setIsMajorUpdate(willBeMajorUpdate) // Splashscreen si beaucoup de catégories à déselectionner
     try {
-      await new Promise(resolve => setTimeout(resolve, 50))
+      await new Promise(resolve => setTimeout(resolve, willBeMajorUpdate ? 600 : 50))
       setSelectedCategories(new Set())
     } finally {
       setIsUpdating(false)
+      setIsMajorUpdate(false)
     }
-  }, [])
+  }, [selectedCategories.size])
 
   const handlePrint = useCallback(() => {
     // Ajouter un délai avant l'impression pour permettre le chargement des images
@@ -376,62 +439,7 @@ export default function CatalogueTableauPage() {
 
           {/* Section de chargement - optimisée sans espace supplémentaire */}
           {isLoading && (
-            <div className="flex min-h-[400px] items-center justify-center">
-              <div className="w-full max-w-sm">
-                {/* Spinner principal avec double rotation */}
-                <div className="flex justify-center mb-6">
-                  <div className="loading-spinner-complex">
-                    <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-                    <div className="absolute inset-1 w-10 h-10 border-4 border-transparent border-r-primary/40 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
-                    <div className="absolute inset-3 w-6 h-6 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full animate-pulse"></div>
-                  </div>
-                </div>
-
-                {/* Message de chargement */}
-                <div className="text-center mb-6">
-                  <p className="font-semibold text-gray-900 mb-2 animate-fade-in">{loadingStep}</p>
-                  <div className="flex items-center justify-center gap-2 text-sm mb-3" style={{ animationDelay: '0.2s' }}>
-                    <span className="font-medium text-primary">{Math.round(loadingProgress)}%</span>
-                    <span className="text-gray-500">•</span>
-                    <span className="text-gray-600">
-                      {loadingProgress < 30 ? "Initialisation" : 
-                       loadingProgress < 60 ? "Chargement des données" :
-                       loadingProgress < 90 ? "Organisation" : "Finalisation"}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Skeleton pour preview du tableau */}
-                <div className="bg-white rounded-xl border shadow-sm p-4 space-y-3 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-primary/20 rounded loading-skeleton"></div>
-                    <div className="h-4 bg-gray-200 rounded flex-1 loading-skeleton"></div>
-                  </div>
-                  <div className="space-y-2">
-                    {[1,2,3,4].map(i => (
-                      <div key={i} className="grid grid-cols-4 gap-3 loading-state" style={{ animationDelay: `${i * 0.1}s` }}>
-                        <div className="h-8 bg-gray-100 rounded loading-skeleton"></div>
-                        <div className="h-8 bg-gray-100 rounded loading-skeleton"></div>
-                        <div className="h-8 bg-gray-100 rounded loading-skeleton"></div>
-                        <div className="h-8 bg-gray-100 rounded loading-skeleton"></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Indicateur de progression réel */}
-                <div className="mt-6 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out relative overflow-hidden"
-                      style={{ width: `${loadingProgress}%` }}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <SplashScreenLoader message={loadingStep} />
           )}
         </div>
 
@@ -469,9 +477,9 @@ export default function CatalogueTableauPage() {
         {/* Spacer for bottom bar */}
         {selectedCount > 0 && <div className="h-32"></div>}
 
-        {/* Loader global - seulement pour les grosses opérations */}
-        {isUpdating && selectedCount > 10 && (
-          <MobileAppLoader message="Synchronisation en cours..." />
+        {/* Loader global - pour les grosses opérations */}
+        {isUpdating && isMajorUpdate && (
+          <SplashScreenLoader message="Synchronisation en cours..." />
         )}
 
         {/* Contenu pour impression uniquement */}

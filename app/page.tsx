@@ -98,121 +98,80 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="mobile-loader">
-        <div className="w-full max-w-md">
-          {/* Logo animé */}
-          <div className="text-center mb-8">
-            <div className="relative mb-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-full animate-pulse"></div>
-              <div className="relative bg-white rounded-2xl p-6 shadow-2xl border border-primary/10 animate-float">
-                <Image 
-                  src="/logo_kleur_2021.png" 
-                  alt="Panneaux Léontine" 
-                  width={180} 
-                  height={60} 
-                  priority 
-                  style={{ height: "auto" }}
-                  className="h-12 w-auto mx-auto animate-pulse-soft"
-                />
-              </div>
-            </div>
-            
-            {/* Titre animé */}
-            <div className="space-y-2">
-              <h1 className="text-2xl font-bold text-gray-900 animate-fade-in">
-                Catalogue Produits
-              </h1>
-              <p className="text-gray-600 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                Découvrez nos panneaux et produits
-              </p>
-            </div>
-          </div>
+      <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: '#c1343b' }}>
+        {/* Patterns de fond animés */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/3 rounded-full animate-ping" style={{ animationDuration: '3s' }}></div>
+        </div>
 
-          {/* Spinner principal avec double rotation */}
-          <div className="flex justify-center mb-6">
-            <div className="loading-spinner-complex">
-              <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-              <div className="absolute inset-2 w-12 h-12 border-4 border-transparent border-r-primary/40 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '2s' }}></div>
-              <div className="absolute inset-4 w-8 h-8 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full animate-pulse"></div>
-            </div>
-          </div>
-
-          {/* Message de statut dynamique */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              <p className="font-semibold text-gray-900 animate-fade-in">
-                {loadingStep}
-              </p>
-            </div>
-            <p className="text-sm text-gray-600 mb-3">
-              Veuillez patienter pendant que nous préparons votre catalogue
-            </p>
-            
-            {/* Pourcentage de progression */}
-            <div className="flex items-center justify-center gap-2 text-sm">
-              <span className="font-medium text-primary">{Math.round(loadingProgress)}%</span>
-              <span className="text-gray-500">•</span>
-              <span className="text-gray-600">
-                {loadingProgress < 25 ? "Initialisation" : 
-                 loadingProgress < 50 ? "Récupération des données" :
-                 loadingProgress < 75 ? "Traitement" :
-                 loadingProgress < 90 ? "Chargement du contenu" : "Presque terminé"}
-              </span>
-            </div>
-          </div>
-
-          {/* Skeleton cards pour prévisualiser le contenu */}
-          <div className="space-y-4">
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg loading-skeleton"></div>
-                <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded loading-skeleton mb-2"></div>
-                  <div className="h-3 bg-gray-100 rounded loading-skeleton w-2/3"></div>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {[1,2,3,4,5,6].map(i => (
-                  <div key={i} className="aspect-square bg-gray-100 rounded-lg loading-skeleton" style={{ animationDelay: `${i * 0.1}s` }}></div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gray-200 rounded loading-skeleton"></div>
-                  <div className="h-4 bg-gray-200 rounded flex-1 loading-skeleton"></div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="h-8 bg-gray-100 rounded loading-skeleton"></div>
-                  <div className="h-8 bg-gray-100 rounded loading-skeleton"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Indicateur de progression réel */}
-          <div className="mt-8 space-y-2">
-            {/* Barre de progression principale */}
-            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
-              <div 
-                className="h-full bg-gradient-to-r from-primary via-primary/90 to-primary/80 rounded-full transition-all duration-500 ease-out relative overflow-hidden"
-                style={{ width: `${loadingProgress}%` }}
-              >
-                {/* Effet de brillance qui se déplace */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-              </div>
-            </div>
-            
-            {/* Progression circulaire alternative - plus compact */}
-            <div className="flex items-center justify-center">
-              <ProgressCircle 
-                progress={loadingProgress} 
-                size="md" 
-                className="drop-shadow-sm" 
+        <div className="relative flex flex-col items-center">
+          {/* Logo avec spinner séparé en dessous */}
+          <div className="relative mb-12 flex flex-col items-center">
+            {/* Logo au-dessus - plus grand et plus haut */}
+            <div className="mb-12">
+              <Image 
+                src="/logo-white-pl.png" 
+                alt="Panneaux Léontine" 
+                width={200} 
+                height={67} 
+                priority 
+                style={{ height: "auto" }}
+                className="h-16 w-auto"
+                onError={(e) => {
+                  // Fallback au logo normal si le blanc n'existe pas
+                  e.currentTarget.src = "/logo_kleur_2021.png"
+                }}
               />
+            </div>
+
+            {/* Spinner circulaire en dessous avec pourcentage au centre */}
+            <div className="w-32 h-32 relative flex items-center justify-center">
+              {/* Cercle externe */}
+              <div className="absolute inset-0 border-4 border-white/20 rounded-full"></div>
+              {/* Cercle animé */}
+              <div className="absolute inset-0 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+              
+              {/* Pourcentage au centre du cercle */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-white font-bold text-xl">
+                  {Math.round(loadingProgress)}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Message et points animés */}
+          <div className="text-center">
+            {/* Points de chargement style iOS */}
+            <div className="flex justify-center space-x-2 mb-4">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="w-2 h-2 bg-white rounded-full animate-bounce"
+                  style={{ 
+                    animationDelay: `${i * 0.2}s`,
+                    animationDuration: '1.2s'
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Description de l'étape */}
+            <div className="text-white/70 text-sm">
+              {loadingProgress < 25 ? "Initialisation" : 
+               loadingProgress < 50 ? "Récupération des données" :
+               loadingProgress < 75 ? "Traitement" :
+               loadingProgress < 90 ? "Chargement du contenu" : "Presque terminé"}
+            </div>
+          </div>
+
+          {/* Barre de progression en bas */}
+          <div className="fixed bottom-12 left-8 right-8">
+            <div className="bg-white/20 rounded-full h-1 overflow-hidden backdrop-blur-sm">
+              <div 
+                className="h-full bg-gradient-to-r from-white via-white/90 to-white/70 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${loadingProgress}%` }}
+              ></div>
             </div>
           </div>
         </div>
@@ -232,19 +191,6 @@ export default function HomePage() {
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                   Catalogue Produits
                 </h1>
-                <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-                  Explorez notre gamme complète de panneaux en bois et produits d'aménagement
-                </p>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    {availableCategories.length} catégories
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    {totalUniqueProducts} produits
-                  </span>
-                </div>
               </div>
               
               {/* Actions d'impression pour mobile */}
