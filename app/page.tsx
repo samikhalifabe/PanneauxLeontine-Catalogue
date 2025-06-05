@@ -114,7 +114,7 @@ export default function HomePage() {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/3 rounded-full animate-ping" style={{ animationDuration: '3s' }}></div>
         </div>
 
-        <div className="relative flex flex-col items-center justify-center h-full w-full">
+        <div className="absolute inset-0 flex items-center justify-center w-full h-screen min-h-screen" style={{ height: '100vh', minHeight: '100vh' }}>
           {/* Logo avec spinner séparé en dessous */}
           <div className="flex flex-col items-center justify-center">
             {/* Logo au-dessus - plus grand et plus haut */}
